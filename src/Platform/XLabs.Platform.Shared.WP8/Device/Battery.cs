@@ -48,7 +48,8 @@ namespace XLabs.Platform.Device
         /// <param name="o">The o.</param>
         private void OnRemainingChargePercentChanged(object sender, object o)
         {
-            onLevelChange?.Invoke(sender, Level);
+            if (onLevelChange != null)
+                onLevelChange.Invoke(sender, Level);
         }
 
         /// <summary>
@@ -58,7 +59,8 @@ namespace XLabs.Platform.Device
         /// <param name="eventArgs">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void OnPowerSourceChanged(object sender, System.EventArgs eventArgs)
         {
-            onChargerStatusChanged?.Invoke(sender, Charging);
+            if (onChargerStatusChanged != null)
+                onChargerStatusChanged.Invoke(sender, Charging);
         }
 
         #region partial implementations

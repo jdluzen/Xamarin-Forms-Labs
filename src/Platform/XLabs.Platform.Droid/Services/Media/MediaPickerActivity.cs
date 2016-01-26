@@ -293,6 +293,7 @@ namespace XLabs.Platform.Services.Media
 
                 if (!ran)
                 {
+                    #if ANDROID6
                     if (global::Android.OS.Build.VERSION.Release == "6.0")
                                         {
                                     if (CheckSelfPermission(Manifest.Permission.Camera) != Android.Content.PM.Permission.Granted)
@@ -300,6 +301,7 @@ namespace XLabs.Platform.Services.Media
                                         RequestPermissions(new string[] { Manifest.Permission.Camera }, 1);
                                     }
                                         }
+                    #endif
                     StartActivityForResult(pickIntent, _id);
                 }
             }

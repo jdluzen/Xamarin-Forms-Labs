@@ -131,29 +131,30 @@ namespace XLabs.Platform.Services
         public async Task<bool> IsReachable(string host, TimeSpan timeout)
         {
             var task = Task.Factory.StartNew<bool>(
-                () =>
+                           () =>
+                {
+                    var icp = NetworkInformation.GetInternetConnectionProfile();
+                    if (icp != null && icp.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.None)
                     {
-                        if (NetworkInformation.GetInternetConnectionProfile()?.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.None)
-                        {
-                            return false;
-                        }
-
-                        try
-                        {
-                            var endPointPairListTask = DatagramSocket.GetEndpointPairsAsync(new HostName(host), "0");
-                            
-                            var endPointPairList = endPointPairListTask.GetResults();
-
-                            var endPointPair = endPointPairList.First();
-
-                            return true;
-                        }
-                        catch (Exception)
-                        {
-                        }
-
                         return false;
-                    });
+                    }
+
+                    try
+                    {
+                        var endPointPairListTask = DatagramSocket.GetEndpointPairsAsync(new HostName(host), "0");
+                            
+                        var endPointPairList = endPointPairListTask.GetResults();
+
+                        var endPointPair = endPointPairList.First();
+
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    return false;
+                });
 
             return await task;
         }
@@ -172,9 +173,10 @@ namespace XLabs.Platform.Services
         {
             get
             {
+                var icp = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile();
                 return
-                    Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile()?.GetNetworkConnectivityLevel() ==
-                    NetworkConnectivityLevel.InternetAccess;
+                    icp != null && icp.GetNetworkConnectivityLevel() ==
+                NetworkConnectivityLevel.InternetAccess;
             }
         }
 
@@ -193,12 +195,12 @@ namespace XLabs.Platform.Services
                 WwanDataClass connectionClass = profile.WwanConnectionProfileDetails.GetCurrentDataClass();
                 switch (connectionClass)
                 {
-                    //2G-equivalent
+                //2G-equivalent
                     case WwanDataClass.Edge:
                     case WwanDataClass.Gprs:
                         return 2;
 
-                    //3G-equivalent
+                //3G-equivalent
                     case WwanDataClass.Cdma1xEvdo:
                     case WwanDataClass.Cdma1xEvdoRevA:
                     case WwanDataClass.Cdma1xEvdoRevB:
@@ -211,15 +213,15 @@ namespace XLabs.Platform.Services
                     case WwanDataClass.Hsupa:
                         return 3;
 
-                    //4G-equivalent
+                //4G-equivalent
                     case WwanDataClass.LteAdvanced:
                         return 4;
 
-                    //not connected
+                //not connected
                     case WwanDataClass.None:
                         return 0;
 
-                    //unknown
+                //unknown
                     case WwanDataClass.Custom:
                     default:
                         return 0;

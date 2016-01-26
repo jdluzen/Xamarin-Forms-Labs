@@ -422,7 +422,7 @@ namespace XLabs.Caching
 		/// <returns>Retrurns true on success</returns>
 		public async Task<bool> FlushAllAsync()
 		{
-			return await Task.Factory.StartNew(FlushAll);
+			return await Task.Factory.StartNew<bool>(FlushAll);
 		}
 		#endregion IAsyncCacheProvider
 	}
